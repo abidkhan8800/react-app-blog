@@ -1,15 +1,30 @@
-import React, {useState} from 'react'
+import React from 'react';
+import db from '../config/firbaseConfig';
+import {collection, addDoc} from 'firebase/firestore';
+import {useFormInput} from '../Hooks/hooks'
 
 function CreatePost() {
-  const [title, setTitle] = useState('');
-  const [subTitle, setSubTitle] = useState('');
-  const [content, setContent] = useState('');
+  const title = useFormInput('');
+  const subTitle = useFormInput('');
+  const content = useFormInput('');
 
-  function handleSubmit(e){
+  async function handleSubmit(e){
     e.preventDefault();
     console.log('title', title);
     console.log('subTitle', subTitle);
     console.log('content', content);
+
+    const docRef = await addDoc(collection(db, "posts"),{
+      title: title.value,
+      subTitle: subTitle.value,
+      content: content.value,
+      createdAt: new Date(),
+    });
+    if(!docRef){
+      console.log("error: ", docRef)
+    }else{
+      console.log('docRef ',docRef)
+    }
   }
 
   return (
@@ -18,13 +33,13 @@ function CreatePost() {
       <form onSubmit={handleSubmit}> 
         <div className="form-field">
           <label>Title</label>
-          <input value={title} onChange={(e)=> setTitle(e.target.value)}/>
+          <input {...title}/>
 
           <label>Subtitle</label>
-          <input value={subTitle} onChange={(e)=> setSubTitle(e.target.value)}/>
+          <input {...subTitle} />
 
           <label>Content</label>
-          <textarea value={content} onChange={(e)=> setContent(e.target.value)}></textarea>
+          <textarea {...content}></textarea>
 
           <button className="create-post-btn">Create Post</button>
         </div>
